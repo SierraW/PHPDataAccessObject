@@ -4,7 +4,7 @@
  * User: sierramws
  * Date: 2020-07-01
  * Time: 10:39
- * Version: 1.0
+ * Version: 1.1
  */
 
 class DaoWeb{
@@ -157,6 +157,44 @@ class DaoWeb{
             $sql .= " WHERE {$condition_sql}";
             return $this->getData($sql);
         }
+    }
+
+    /*
+     * 'selected', 'conTb' ['lblTb'=> 'nTb', 'on' => 0, 1, joSt], condi, orTb, lblOrTb, orBy
+     */
+    function joinSelect($data_map) {
+        $sql = "SELECT ";
+        if ($data_map['selected'] == null) {
+            $sql .= "* ";
+        } else {
+            $isFirst = true;
+            foreach ($data_map['selected'] as $item) {
+                if ($isFirst) {
+                    $isFirst = false;
+                } else {
+                    $sql .= ", ";
+                }
+                $sql .= $item;
+            }
+        }
+
+        $sql .= " FROM {$data_map['orTb']} {$data_map['lblOrTb']}";
+
+        foreach($data_map['conTb'] as $key=>$value) {
+            $sql .= " {$value['joSt']} {$value['nTb']} {$key}";
+            $on = $value['on'];
+            $sql .= " ON {$on[0]} = {$on[1]}";
+        }
+
+        if ($data_map['condi'] != null) {
+            $sql .= " WHERE {$data_map['condi']}";
+        }
+
+        if ($data_map['orBy'] != null) {
+            $sql .= " ORDER BY {$data_map['orBy']}";
+        }
+
+        return $this->getData($sql);
     }
 
     function delete($table_name, $condition_sql) {
